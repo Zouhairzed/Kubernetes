@@ -1,0 +1,51 @@
+- create deployment using the image tomcat8-alpine with 5 pods :
+
+        
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: tomcatdeployment
+        spec:
+          replicas: 5
+          selector:
+            matchLabels:
+              appli: finance
+
+          template:
+            metadata:
+              labels:
+                appli: finance
+            spec:
+              containers:
+                - name: tomcatpod
+                  image: tomcat:8-alpine
+
+
+- create a nodeport service to expose the pods externally :
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcatservice
+spec:
+  type: NodePort
+  ports:
+  - name: "tomcatport"
+    port: 90
+    nodePort: 32000
+    targetPort: 8080
+  selector:
+    appli: finance
+
+
+- update image of the deployment using the image tomcat9-alpine:
+
+    kubectl set image deployments/tomcatdeployment tomcatpod=tomcat:9-alpine
+    
+ - check the status of the rolling update via :
+ 
+    kubectl rollout status deployments/tomcatdeployment 
+    
+- roll back to the previous version of tomcat :
+
+    kubectl rollout undo deployments/tomcatdeployment 
