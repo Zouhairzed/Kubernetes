@@ -1,0 +1,1 @@
+image: kodekloud/webapp-color:v1
